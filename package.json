@@ -4,7 +4,7 @@
   "description": "A fork of redditp plus socket.io for sync-ed viewing",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
