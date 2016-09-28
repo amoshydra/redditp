@@ -1,0 +1,24 @@
+{
+  "name": "redditp-socketio",
+  "version": "1.0.0",
+  "description": "A fork of redditp plus socket.io for sync-ed viewing",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amoshydra/redditp.git"
+  },
+  "author": "amoshydra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amoshydra/redditp/issues"
+  },
+  "homepage": "https://github.com/amoshydra/redditp#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8"
+  }
+}

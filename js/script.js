@@ -24,7 +24,7 @@ rp.session = {
     // 0-based index to set which picture to show first
     // init to -1 until the first image is loaded
     activeIndex: -1,
-    
+
     // Variable to store if the animation is playing or not
     isAnimating: false,
 
@@ -49,13 +49,36 @@ rp.cache = {};
 
 $(function () {
 
+    // socket IO
+    var socket = io();
+    // var preIndex = -1;
+    socket.on('start animation', function(index){
+      // if (preIndex != index) {
+        startAnimation2(index);
+        // preIndex = index;
+      // }
+    });
+
+    // start of program
+    var pathname = window.location.pathname;
+    socket.emit("hasNewConnection", pathname);
+
+    socket.on('hasNewConnection', function(remotePathName) {
+      toastr.info("someone has joined the session!");
+      var myPathName = window.location.pathname;
+      if (remotePathName != myPathName) {
+        window.location.pathname = remotePathName;
+      }
+    });
+
+
     pictureSliderId = "#pictureSlider";
 
     $("#subredditUrl").text("Loading Reddit Slideshow");
     $("#navboxTitle").text("Loading Reddit Slideshow");
 
     var fadeoutWhenIdle = true;
-    
+
     var setupFadeoutOnIdle = function () {
         $('.fadeOnIdle').fadeTo('fast', 0);
         var navboxVisible = false;
@@ -103,7 +126,7 @@ $(function () {
         var next = getNextSlideIndex(rp.session.activeIndex);
         startAnimation(next);
     }
-    
+
     function prevSlide() {
         if(!rp.settings.nsfw) {
             for(var i = rp.session.activeIndex - 1; i > 0; i--) {
@@ -115,19 +138,19 @@ $(function () {
         startAnimation(rp.session.activeIndex - 1);
     }
 
-    
+
     var autoNextSlide = function () {
         if (rp.settings.shouldAutoNextSlide) {
             // startAnimation takes care of the setTimeout
             nextSlide();
         }
     };
-    
+
     function open_in_background(selector){
         // as per https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
         // works on latest chrome, safari and opera
         var link = $(selector)[0];
-        
+
         // Simulating a ctrl key won't trigger a background tab on IE and Firefox ( https://bugzilla.mozilla.org/show_bug.cgi?id=812202 )
         // so we need to open a new window
         if ( navigator.userAgent.match(/msie/i) || navigator.userAgent.match(/trident/i)  || navigator.userAgent.match(/firefox/i) ){
@@ -193,7 +216,7 @@ $(function () {
         Cookies.set(c_name, value, { expires: rp.settings.cookieDays });
     };
 
-    
+
     var getCookie = function (c_name) {
         // undefined in case nothing found
         return Cookies.get(c_name);
@@ -273,11 +296,11 @@ $(function () {
             rp.settings.timeToNextSlide = parseFloat(timeByCookie) * 1000;
             $('#timeToNextSlide').val(timeByCookie);
         }
-        
+
         $('#fullScreenButton').click(toggleFullScreen);
 
         $('#timeToNextSlide').keyup(updateTimeToNextSlide);
-        
+
         $('#prevButton').click(prevSlide);
         $('#nextButton').click(nextSlide);
     };
@@ -299,7 +322,7 @@ $(function () {
         gfycat: 'gfycat',
         gifv: 'gifv'
     }
-    
+
     var addImageSlide = function (pic) {
         /*
         var pic = {
@@ -336,7 +359,7 @@ $(function () {
         }
 
         rp.session.foundOneImage = true;
-        
+
         // Do not preload all images, this is just not performant.
         // Especially in gif or high-res subreddits where each image can be 50 MB.
         // My high-end desktop browser was unresponsive at times.
@@ -377,7 +400,7 @@ $(function () {
     var R_KEY = 82;
     var T_KEY = 84;
 
-    
+
     // Register keyboard events on the whole document
     $(document).keyup(function (e) {
         if(e.ctrlKey) {
@@ -456,7 +479,7 @@ $(function () {
             return true;
         }
     };
-    
+
     var preloadNextImage = function(imageIndex) {
         var next = getNextSlideIndex(imageIndex);
         // Always clear cache - no need for memory bloat.
@@ -465,12 +488,17 @@ $(function () {
         if(next < rp.photos.length)
             rp.cache[next] = createDiv(next);
     };
-    
+
     //
     // Starts the animation, based on the image index
     //
     // Variable to store if the animation is playing or not
-    var startAnimation = function (imageIndex) {
+    var startAnimation = function(imageIndex) {
+      socket.emit("start animation", imageIndex);
+      startAnimation2(imageIndex);
+    }
+
+    var startAnimation2 = function (imageIndex) {
         resetNextSlideTimer();
 
         // If the same number has been chosen, or the index is outside the
@@ -552,7 +580,7 @@ $(function () {
                     playButton.show();
                 } else {
                     // AbortError can happen I think with e.g. a 404, user clicking next before loading finishes,
-                    // In that case, we don't want the play button to show. Here is a recorded example from 
+                    // In that case, we don't want the play button to show. Here is a recorded example from
                     // https://redditp.com/r/eyebleach/top?t=month
                     //code: 20,
                     //message: "The play() request was interrupted by a call to pause().",
@@ -580,14 +608,14 @@ $(function () {
         oldDiv.fadeOut(rp.settings.animationSpeed, function () {
             oldDiv.remove();
             rp.session.isAnimating = false;
-            
+
             var maybeVid = $('video');
             if(maybeVid.length > 0) {
                 startPlayingVideo(maybeVid);
             }
         });
     }
-    
+
     var createDiv = function(imageIndex) {
         // Retrieve the accompanying photo based on the index
         var photo = rp.photos[imageIndex];
@@ -608,7 +636,7 @@ $(function () {
             cssMap['background-position'] = "center";
 
             divNode.css(cssMap).addClass("clouds");
-            
+
         } else if(photo.type === imageTypes.gfycat || photo.type === imageTypes.gifv) {
             embedit.embed(photo.url, function(elem) {
                 divNode.append(elem);
@@ -620,12 +648,12 @@ $(function () {
         } else {
             toastr.error('Unhandled image type, please alert ubershmekel on <a href="https://github.com/ubershmekel/redditp/issues">github</a>');
         }
-        
+
         return divNode;
     };
 
-    
-    
+
+
     var verifyNsfwMakesSense = function() {
         // Cases when you forgot NSFW off but went to /r/nsfw
         // can cause strange bugs, let's help the user when over 80% of the
@@ -636,14 +664,14 @@ $(function () {
                 nsfwImages += 1;
             }
         }
-        
+
         if(0.8 < nsfwImages * 1.0 / rp.photos.length) {
             rp.settings.nsfw = true;
             $("#nsfw").prop("checked", nsfw);
         }
     };
-    
-    
+
+
     var tryConvertUrl = function (url) {
         if (url.indexOf('imgur.com') > 0 || url.indexOf('/gallery/') > 0) {
             // special cases with imgur
@@ -660,7 +688,7 @@ $(function () {
                 //log('Unsupported gallery: ' + url);
                 return '';
             }
-            
+
             // imgur is really nice and serves the image with whatever extension
             // you give it. '.jpg' is arbitrary
             // regexp removes /r/<sub>/ prefix if it exists
@@ -694,7 +722,7 @@ $(function () {
         // Detect predefined reddit url paths. If you modify this be sure to fix
         // .htaccess
         // This is a good idea so we can give a quick 404 page when appropriate.
-        
+
         var regexS = "(/(?:(?:r/)|(?:imgur/a/)|(?:user/)|(?:domain/)|(?:search))[^&#?]*)[?]?(.*)";
         var regex = new RegExp(regexS);
         var results = regex.exec(window.location.href);
@@ -711,14 +739,14 @@ $(function () {
             // already loaded images, don't ruin the existing experience
             return;
         }
-        
+
         // remove "loading" title
         $('#navboxTitle').text('');
-        
+
         // display alternate recommendations
         $('#recommend').css({'display':'block'});
     };
-    
+
     var getRedditImages = function () {
         //if (noMoreToLoad){
         //    log("No more images to load, will rotate to start.");
@@ -754,7 +782,7 @@ $(function () {
             });
 
             verifyNsfwMakesSense();
-            
+
             if (!rp.session.foundOneImage) {
                 // Note: the jsonp url may seem malformed but jquery fixes it.
                 //log(jsonUrl);
@@ -774,7 +802,7 @@ $(function () {
                 addNumberButton(numberButton);
             }
             rp.session.loadingNextImages = false;
-            
+
         };
 
         if (rp.settings.debug)
@@ -815,7 +843,7 @@ $(function () {
                     title: item.title,
                     over18: item.nsfw,
                     commentsLink: ""
-                });                
+                });
             });
 
             verifyNsfwMakesSense();
@@ -857,7 +885,7 @@ $(function () {
         //log(rp.urlData)
         rp.subredditUrl = rp.urlData[0];
         getVars = rp.urlData[1];
-        
+
         if (getVars.length > 0) {
             getVarsQuestionMark = "?" + getVars;
         } else {
@@ -878,10 +906,10 @@ $(function () {
         } else {
             subredditName = rp.subredditUrl + getVarsQuestionMark;
         }
-        
+
 
         var visitSubredditUrl = rp.redditBaseUrl + rp.subredditUrl + getVarsQuestionMark;
-        
+
         // truncate and display subreddit name in the control box
         var displayedSubredditName = subredditName;
         // empirically tested capsize, TODO: make css rules to verify this is enough.
@@ -892,12 +920,12 @@ $(function () {
         }
         $('#subredditUrl').html("<a href='" + visitSubredditUrl + "'>" + displayedSubredditName + "</a>");
 
-        document.title = "redditP - " + subredditName;
+        document.title = "Socket RedditP - " + subredditName;
     };
-    
-    
 
-    
+
+
+
     rp.redditBaseUrl = "http://www.reddit.com";
     if (location.protocol === 'https:') {
         // page is secure
@@ -906,7 +934,7 @@ $(function () {
     }
 
     var getVars;
-    
+
     initState();
     setupUrls();
 

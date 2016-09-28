@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
-
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 app.use('/css', express.static(__dirname + '/css'));
 app.use('/images', express.static(__dirname + '/images'));
@@ -12,10 +13,22 @@ app.get('/*', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-var port = process.env.PORT || 8080;
+io.on('connection', function(socket){
+  console.log("connected");
+  socket.on('start animation', function(imageIndex){
+    io.emit('start animation', imageIndex);
+  });
+  socket.on('prev slide', function(){
+    io.emit('prev slide');
+  });
+  socket.on('hasNewConnection', function(path){
+    io.emit('hasNewConnection', path);
+  });
+});
+
+var port = process.env.PORT || 3031;
 //app.set('port', port);
 
-
-app.listen(port, function () {
+http.listen(port, function () {
     console.log('Listening on port: ' + port);
 });
