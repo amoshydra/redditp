@@ -1,9 +1,19 @@
-redditp
+redditp + `socket.io`
 =======
 
-A full screen reddit presentation or slide show.
+A fork of the full screen reddit presentation or slide show. Now with socket.io implementation to allow multiple users to browse redditp together on different devices.
 
-http://redditp.com
+## Running this
+
+```
+npm install -g nodemon
+npm install
+npm start
+```
+
+-----------
+
+About the original redditp
 
 Hotkeys
 -------
@@ -12,7 +22,7 @@ Hotkeys
 * t - collapse/uncollapse title
 * c - collapse/uncollapse controls
 * i - open image in a new tab
-* r - open comments in a new tab 
+* r - open comments in a new tab
 * f - toggle full screen mode
 * Arrow keys, pgup/pgdown, spacebar change slides
 * Swipe gestures on phones
