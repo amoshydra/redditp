@@ -14,7 +14,11 @@ app.get('/*', function(req, res) {
 });
 
 io.on('connection', function(socket){
-  console.log("connected");
+  var d = new Date()
+  var socketId = socket.id;
+  var clientIp = socket.client.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+  console.log(d.toLocaleString() + ": Connected " + clientIp + " (" + socketId + ")");
+
   socket.on('start animation', function(imageIndex){
     io.emit('start animation', imageIndex);
   });
