@@ -13,7 +13,7 @@ rp.settings = {
     debug: true,
     // Speed of the animation
     animationSpeed: 1000,
-    shouldAutoNextSlide: true,
+    shouldAutoNextSlide: false,
     timeToNextSlide: 6 * 1000,
     cookieDays: 300,
     goodExtensions: ['.jpg', '.jpeg', '.gif', '.bmp', '.png'],
