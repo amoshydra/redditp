@@ -6,7 +6,6 @@ A fork of the full screen reddit presentation or slide show. Now with socket.io 
 ## Running this
 
 ```
-npm install -g nodemon
 npm install
 npm start
 ```
