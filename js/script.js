@@ -142,7 +142,7 @@ $(function () {
     var autoNextSlide = function () {
         if (rp.settings.shouldAutoNextSlide) {
             // startAnimation takes care of the setTimeout
-            nextSlide();
+            // nextSlide();
         }
     };
 
@@ -278,7 +278,7 @@ $(function () {
         if (autoByCookie === undefined) {
             updateAutoNext();
         } else {
-            rp.settings.shouldAutoNextSlide = (autoByCookie === "true");
+            rp.settings.shouldAutoNextSlide = (autoByCookie === "false");
             $("#autoNextSlide").prop("checked", rp.settings.shouldAutoNextSlide);
         }
         $('#autoNextSlide').change(updateAutoNext);
