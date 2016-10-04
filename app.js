@@ -28,6 +28,12 @@ io.on('connection', function(socket){
   socket.on('hasNewConnection', function(path){
     io.emit('hasNewConnection', path);
   });
+
+  socket.on('disconnect', function() {
+    var d = new Date();
+    console.log(d.toLocaleString() + ": Disconnected " + clientIp + " (" + socketId + ")");
+  });
+
 });
 
 var port = process.env.PORT || 3031;
