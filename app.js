@@ -29,6 +29,10 @@ io.on('connection', function(socket){
     io.emit('hasNewConnection', path);
   });
 
+  socket.on('chat message', function(msg){
+    io.emit('chat message', msg, socketId);
+  });
+
   socket.on('disconnect', function() {
     var d = new Date();
     console.log(d.toLocaleString() + ": Disconnected " + clientIp + " (" + socketId + ")");

@@ -55,7 +55,7 @@
     <div class="nextArrow fadeOnIdle" title="Try the arrow keys too" id="nextButton"></div>
 
     <div id="controlsDiv" class='navbox clouds fadeOnIdle'>
-        <div class="collapser" data-openstate="open">-</div>
+        <div class="collapser" data-openstate="closed">-</div>
         <div id="navboxContents">
             <ul class="nbmenu">
                 <li id="subredditUrl"><noscript>No javascript, no gain.</noscript>
@@ -134,6 +134,13 @@
         <div>
             <!-- Empty div to be animated out, do not erase -->
         </div>
+    </div>
+
+    <div id="messenger">
+      <div id="messages"></div>
+      <form action="">
+        <input id="m" autocomplete="off" /><button>Send</button>
+      </form>
     </div>
 
 </body>

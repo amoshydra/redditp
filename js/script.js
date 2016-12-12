@@ -51,6 +51,33 @@ $(function () {
 
     // socket IO
     var socket = io();
+
+    // Messenger
+    $('form').submit(function(){
+      var messageValue = $('#m').val();
+      if (messageValue.length > 0) {
+        socket.emit('chat message', messageValue);
+        $('#m').val('');
+      }
+      return false;
+    });
+    socket.on('chat message', function(msg, socketId){
+      console.log(socket);
+      var messageLine = $('<div>').html(`<span class="author">${socketId.substring(0,5)}:</span> ${msg}`);
+      $('#messages').append(messageLine);
+
+      setTimeout(function() {
+        makeElementDisappear(messageLine);
+      }, 30000);
+    });
+
+    function makeElementDisappear(element) {
+      element.hide('slow');
+      setTimeout(function() {
+        element.remove();
+      }, 500);
+    }
+
     // var preIndex = -1;
     socket.on('start animation', function(index){
       // if (preIndex != index) {
@@ -141,6 +168,7 @@ $(function () {
 
     var autoNextSlide = function () {
         if (rp.settings.shouldAutoNextSlide) {
+          rp.settings.shouldAutoNextSlide = false;
             // startAnimation takes care of the setTimeout
             // nextSlide();
         }
@@ -162,7 +190,7 @@ $(function () {
         }
     }
 
-    $(pictureSliderId).touchwipe({
+    $('body').touchwipe({
         // wipeLeft means the user moved his finger from right to left.
         wipeLeft: nextSlide,
         wipeRight: prevSlide,
@@ -182,8 +210,12 @@ $(function () {
             // move to the left just enough so the collapser arrow is visible
             var arrowLeftPoint = $(this).position().left;
             $(this).parent().animate({
-                left: "-" + arrowLeftPoint + "px"
+                left: "-" + arrowLeftPoint + "px",
             });
+	    $(this).parent().css({
+               top: 'calc(100% - 80px)',
+	       bottom: 'initial'
+	    });
             $(this).attr(OPENSTATE_ATTR, "closed");
         } else {
             // open it
@@ -191,6 +223,10 @@ $(function () {
             $(this).parent().animate({
                 left: "0px"
             });
+	    $(this).parent().css({
+               top: '',
+	       bottom: ''
+	    });
             $(this).attr(OPENSTATE_ATTR, "open");
         }
     });
@@ -421,23 +457,23 @@ $(function () {
 
         switch (code) {
             case C_KEY:
-                $('#controlsDiv .collapser').click();
+                // $('#controlsDiv .collapser').click();
                 break;
             case T_KEY:
-                $('#titleDiv .collapser').click();
+                // $('#titleDiv .collapser').click();
                 break;
             case A_KEY:
-                $("#autoNextSlide").prop("checked", !$("#autoNextSlide").is(':checked'));
-                updateAutoNext();
+                // $("#autoNextSlide").prop("checked", !$("#autoNextSlide").is(':checked'));
+                // updateAutoNext();
                 break;
             case I_KEY:
-                open_in_background("#navboxLink");
+                // open_in_background("#navboxLink");
                 break;
             case R_KEY:
-                open_in_background("#navboxCommentsLink");
+                // open_in_background("#navboxCommentsLink");
                 break;
             case F_KEY:
-                toggleFullScreen();
+                // toggleFullScreen();
                 break;
             case PAGEUP:
             case arrow.left:
@@ -447,7 +483,7 @@ $(function () {
             case arrow.right:
             case arrow.down:
             case SPACE:
-                return nextSlide();
+                //return nextSlide();
         }
     });
 
@@ -552,6 +588,17 @@ $(function () {
     });
     $(pictureSliderId).append(playButton);
     playButton.hide();
+
+    $('#page').click(function() {
+	  var videoObj = $('video')[0];
+	  if (videoObj) {
+	     videoObj.play();
+	     if (!$(videoObj)[0].paused) {
+                playButton.hide();	     
+	     };
+	  }
+    });
+
 
     var startPlayingVideo = function(vid_jq) {
         // Loop or auto next slide
