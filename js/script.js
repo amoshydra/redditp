@@ -589,17 +589,6 @@ $(function () {
     $(pictureSliderId).append(playButton);
     playButton.hide();
 
-    $('#page').click(function() {
-	  var videoObj = $('video')[0];
-	  if (videoObj) {
-	     videoObj.play();
-	     if (!$(videoObj)[0].paused) {
-                playButton.hide();	     
-	     };
-	  }
-    });
-
-
     var startPlayingVideo = function(vid_jq) {
         // Loop or auto next slide
         // TODO: make this update every time you check/uncheck auto-play
@@ -687,6 +676,10 @@ $(function () {
         } else if(photo.type === imageTypes.gfycat || photo.type === imageTypes.gifv) {
             embedit.embed(photo.url, function(elem) {
                 divNode.append(elem);
+                $(elem).attr({
+                    muted: '',
+                    playsinline: '',
+                });
                 elem.width('100%').height('100%');
                 // We start paused and play after the fade in.
                 // This is to avoid cached or preloaded videos from playing.
